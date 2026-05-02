@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      pips_participant: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          phone_number: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          phone_number: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          phone_number?: string
+        }
+        Relationships: []
+      }
       pips_result: {
         Row: {
           chat_guid: string
