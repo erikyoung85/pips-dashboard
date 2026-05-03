@@ -1,5 +1,4 @@
 <div class="min-h-screen bg-gray-100">
-
   <!-- Header -->
   <header class="bg-white border-b border-gray-200 px-4 py-5 md:px-8">
     <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Pips Dashboard</h1>
@@ -7,7 +6,6 @@
   </header>
 
   <main class="px-4 py-6 max-w-5xl mx-auto space-y-8 md:px-8 md:py-8">
-
     <!-- Error state -->
     @if (error()) {
       <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -51,7 +49,6 @@
 
     <!-- Main content -->
     @if (!isLoading() && !error()) {
-
       <!-- Player Stats -->
       <section>
         <h2 class="text-lg font-semibold text-gray-800 mb-3">Player Stats</h2>
@@ -60,20 +57,26 @@
             <p-card [header]="player.name">
               <div class="space-y-2 text-sm">
                 <div class="flex justify-between items-center py-1 border-b border-gray-100">
-                  <span class="text-gray-500">Games Played</span>
-                  <span class="font-semibold text-gray-900">{{ player.gamesPlayed }}</span>
+                  <span class="text-gray-400">Games Played</span>
+                  <span class="font-semibold text-gray-400">{{ player.gamesPlayed }}</span>
                 </div>
                 <div class="flex justify-between items-center py-1 border-b border-gray-100">
-                  <span class="text-gray-500">Average Time</span>
-                  <span class="font-semibold text-gray-900">{{ formatTime(player.averageTime) }}</span>
+                  <span class="text-gray-400">Average Time</span>
+                  <span class="font-semibold text-gray-400">{{
+                    formatTime(player.averageTime)
+                  }}</span>
                 </div>
                 <div class="flex justify-between items-center py-1 border-b border-gray-100">
-                  <span class="text-gray-500">Fastest Game</span>
-                  <span class="font-semibold text-green-600">{{ formatTime(player.fastestTime) }}</span>
+                  <span class="text-gray-400">Fastest Game</span>
+                  <span class="font-semibold text-green-600">{{
+                    formatTime(player.fastestTime)
+                  }}</span>
                 </div>
                 <div class="flex justify-between items-center py-1">
-                  <span class="text-gray-500">Slowest Game</span>
-                  <span class="font-semibold text-orange-500">{{ formatTime(player.slowestTime) }}</span>
+                  <span class="text-gray-400">Slowest Game</span>
+                  <span class="font-semibold text-orange-500">{{
+                    formatTime(player.slowestTime)
+                  }}</span>
                 </div>
               </div>
             </p-card>
@@ -89,7 +92,6 @@
       <section>
         <h2 class="text-lg font-semibold text-gray-800 mb-3">Leaderboards</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
           <!-- Most Active -->
           <p-card header="Most Active">
             <p-table [value]="leaderboardGamesPlayed()" [tableStyle]="{ 'min-width': '100%' }">
@@ -105,7 +107,10 @@
                   <td class="text-gray-400 font-medium">{{ rowIndex + 1 }}</td>
                   <td class="font-medium">{{ player.name }}</td>
                   <td class="text-right">
-                    <p-tag [value]="player.gamesPlayed.toString()" [severity]="tagSeverity(rowIndex)" />
+                    <p-tag
+                      [value]="player.gamesPlayed.toString()"
+                      [severity]="tagSeverity(rowIndex)"
+                    />
                   </td>
                 </tr>
               </ng-template>
@@ -127,7 +132,10 @@
                   <td class="text-gray-400 font-medium">{{ rowIndex + 1 }}</td>
                   <td class="font-medium">{{ player.name }}</td>
                   <td class="text-right">
-                    <p-tag [value]="formatTime(player.averageTime)" [severity]="tagSeverity(rowIndex)" />
+                    <p-tag
+                      [value]="formatTime(player.averageTime)"
+                      [severity]="tagSeverity(rowIndex)"
+                    />
                   </td>
                 </tr>
               </ng-template>
@@ -149,7 +157,10 @@
                   <td class="text-gray-400 font-medium">{{ rowIndex + 1 }}</td>
                   <td class="font-medium">{{ player.name }}</td>
                   <td class="text-right">
-                    <p-tag [value]="formatTime(player.fastestTime)" [severity]="tagSeverity(rowIndex)" />
+                    <p-tag
+                      [value]="formatTime(player.fastestTime)"
+                      [severity]="tagSeverity(rowIndex)"
+                    />
                   </td>
                 </tr>
               </ng-template>
@@ -171,16 +182,17 @@
                   <td class="text-gray-400 font-medium">{{ rowIndex + 1 }}</td>
                   <td class="font-medium">{{ player.name }}</td>
                   <td class="text-right">
-                    <p-tag [value]="formatTime(player.slowestTime)" [severity]="tagSeverity(rowIndex)" />
+                    <p-tag
+                      [value]="formatTime(player.slowestTime)"
+                      [severity]="tagSeverity(rowIndex)"
+                    />
                   </td>
                 </tr>
               </ng-template>
             </p-table>
           </p-card>
-
         </div>
       </section>
-
     }
   </main>
 </div>

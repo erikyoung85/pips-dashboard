@@ -11,10 +11,7 @@ import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
-import {
-  PipsResultsService,
-  type PipsResult,
-} from '../services/pips-results/pips-results.service';
+import { PipsResultsService, type PipsResult } from '../services/pips-results/pips-results.service';
 import {
   PipsParticipantsService,
   type PipsParticipant,
@@ -46,9 +43,7 @@ export class DashboardComponent {
   readonly error = signal<string | null>(null);
 
   readonly isLoading = computed(
-    () =>
-      (this.rawResults() === null || this.rawParticipants() === null) &&
-      this.error() === null
+    () => (this.rawResults() === null || this.rawParticipants() === null) && this.error() === null,
   );
 
   readonly participantStats = computed<ParticipantStats[]>(() => {
@@ -56,9 +51,7 @@ export class DashboardComponent {
     const participants = this.rawParticipants();
     if (!results || !participants) return [];
 
-    const phoneToName = new Map<string, string>(
-      participants.map(p => [p.phone_number, p.name])
-    );
+    const phoneToName = new Map<string, string>(participants.map((p) => [p.phone_number, p.name]));
 
     const grouped = new Map<string, PipsResult[]>();
     for (const r of results) {
@@ -70,7 +63,7 @@ export class DashboardComponent {
 
     return Array.from(grouped.entries())
       .map(([phone, games]): ParticipantStats => {
-        const times = games.map(g => g.duration_seconds);
+        const times = games.map((g) => g.duration_seconds);
         return {
           name: phoneToName.get(phone)!,
           gamesPlayed: games.length,
@@ -83,19 +76,19 @@ export class DashboardComponent {
   });
 
   readonly leaderboardGamesPlayed = computed(() =>
-    [...this.participantStats()].sort((a, b) => b.gamesPlayed - a.gamesPlayed)
+    [...this.participantStats()].sort((a, b) => b.gamesPlayed - a.gamesPlayed),
   );
 
   readonly leaderboardAvgTime = computed(() =>
-    [...this.participantStats()].sort((a, b) => a.averageTime - b.averageTime)
+    [...this.participantStats()].sort((a, b) => a.averageTime - b.averageTime),
   );
 
   readonly leaderboardFastest = computed(() =>
-    [...this.participantStats()].sort((a, b) => a.fastestTime - b.fastestTime)
+    [...this.participantStats()].sort((a, b) => a.fastestTime - b.fastestTime),
   );
 
   readonly leaderboardSlowest = computed(() =>
-    [...this.participantStats()].sort((a, b) => b.slowestTime - a.slowestTime)
+    [...this.participantStats()].sort((a, b) => b.slowestTime - a.slowestTime),
   );
 
   constructor() {
