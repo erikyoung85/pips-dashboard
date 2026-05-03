@@ -7,6 +7,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -37,6 +38,7 @@ export class DashboardComponent {
   private readonly resultsService = inject(PipsResultsService);
   private readonly participantsService = inject(PipsParticipantsService);
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly router = inject(Router);
 
   readonly rawResults = signal<PipsResult[] | null>(null);
   readonly rawParticipants = signal<PipsParticipant[] | null>(null);
@@ -108,6 +110,10 @@ export class DashboardComponent {
     } catch (err) {
       this.error.set(err instanceof Error ? err.message : 'Failed to load data');
     }
+  }
+
+  navigateToParticipant(name: string): void {
+    void this.router.navigate(['/participant', name]);
   }
 
   formatTime(seconds: number): string {

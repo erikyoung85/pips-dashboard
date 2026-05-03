@@ -1,0 +1,114 @@
+<div class="min-h-screen bg-gray-100">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 px-4 py-5 md:px-8">
+    <div class="max-w-5xl mx-auto">
+      <button
+        (click)="goBack()"
+        class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-3 transition-colors cursor-pointer bg-transparent border-0 p-0"
+      >
+        <i class="pi pi-arrow-left text-xs"></i>
+        Dashboard
+      </button>
+      <h1 class="text-2xl font-bold text-gray-900 tracking-tight">{{ participantName }}</h1>
+      <p class="text-sm text-gray-500 mt-1">Game history &amp; performance trend</p>
+    </div>
+  </header>
+
+  <main class="px-4 py-6 max-w-5xl mx-auto space-y-8 md:px-8 md:py-8">
+    <!-- Error state -->
+    @if (error()) {
+      <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+        {{ error() }}
+      </div>
+    }
+
+    <!-- Loading state -->
+    @if (isLoading()) {
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <p-card>
+            <p-skeleton height="0.75rem" width="70%" styleClass="mb-2" />
+            <p-skeleton height="1.75rem" width="50%" />
+          </p-card>
+        }
+      </div>
+      <p-card>
+        <p-skeleton height="20rem" />
+      </p-card>
+      <p-card>
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <p-skeleton height="2.5rem" styleClass="mb-2" />
+        }
+      </p-card>
+    }
+
+    <!-- Main content -->
+    @if (!isLoading() && !error()) {
+      @if (stats(); as s) {
+        <!-- Summary Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <p-card>
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">
+              Games Played
+            </p>
+            <p class="text-2xl font-bold text-gray-300">{{ s.gamesPlayed }}</p>
+          </p-card>
+          <p-card>
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">
+              Average Time
+            </p>
+            <p class="text-2xl font-bold text-gray-300">{{ formatTime(s.averageTime) }}</p>
+          </p-card>
+          <p-card>
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Best Time</p>
+            <p class="text-2xl font-bold text-green-600">{{ formatTime(s.fastestTime) }}</p>
+          </p-card>
+          <p-card>
+            <p class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1">Worst Time</p>
+            <p class="text-2xl font-bold text-orange-500">{{ formatTime(s.slowestTime) }}</p>
+          </p-card>
+        </div>
+
+        <!-- Trend Chart -->
+        <p-card header="Completion Time Trend">
+          @if (isBrowser && chartData()) {
+            <div class="h-64 md:h-80">
+              <p-chart
+                type="line"
+                [data]="chartData()!"
+                [options]="chartOptions"
+                [style]="{ height: '100%' }"
+              />
+            </div>
+          }
+        </p-card>
+
+        <!-- Game History -->
+        <p-card header="Game History">
+          <p-table [value]="gamesDesc()" [tableStyle]="{ 'min-width': '100%' }">
+            <ng-template #header>
+              <tr>
+                <th>Game</th>
+                <th class="text-right">Completion Time</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-game>
+              <tr>
+                <td class="font-medium text-gray-500">Pips #{{ game.pips_number }}</td>
+                <td class="text-right font-semibold">{{ formatTime(game.duration_seconds) }}</td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      }
+
+      @if (!stats()) {
+        <div
+          class="rounded-lg border border-gray-200 bg-white px-6 py-10 text-center text-gray-500 text-sm"
+        >
+          No game history found for {{ participantName }}.
+        </div>
+      }
+    }
+  </main>
+</div>
