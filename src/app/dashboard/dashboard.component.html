@@ -16,6 +16,17 @@
     <!-- Loading skeletons -->
     @if (isLoading()) {
       <section>
+        <p-skeleton height="1.5rem" width="10rem" styleClass="mb-3" />
+        <p-card>
+          <div class="space-y-2">
+            @for (i of [1, 2, 3, 4]; track i) {
+              <p-skeleton height="2.25rem" />
+            }
+          </div>
+        </p-card>
+      </section>
+
+      <section>
         <p-skeleton height="1.5rem" width="8rem" styleClass="mb-3" />
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           @for (i of [1, 2, 3, 4]; track i) {
@@ -49,6 +60,44 @@
 
     <!-- Main content -->
     @if (!isLoading() && !error()) {
+      <!-- Today's Game -->
+      <section>
+        <h2 class="text-lg font-semibold text-gray-800 mb-3">Today's Game</h2>
+        <p-card [header]="todaysGameHeader()">
+          <p-table [value]="todaysResults()" [tableStyle]="{ 'min-width': '100%' }">
+            <ng-template #header>
+              <tr>
+                <th class="w-12">#</th>
+                <th>Player</th>
+                <th class="text-right">Time</th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-entry let-rowIndex="rowIndex">
+              <tr>
+                <td class="text-gray-400 font-medium">
+                  @if (entry.durationSeconds !== null) {
+                    {{ rowIndex + 1 }}
+                  } @else {
+                    —
+                  }
+                </td>
+                <td class="font-medium">{{ entry.name }}</td>
+                <td class="text-right">
+                  @if (entry.durationSeconds !== null) {
+                    <p-tag
+                      [value]="formatTime(entry.durationSeconds)"
+                      [severity]="tagSeverity(rowIndex)"
+                    />
+                  } @else {
+                    <span class="text-sm text-gray-400 italic">Not played yet</span>
+                  }
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+      </section>
+
       <!-- Player Stats -->
       <section>
         <h2 class="text-lg font-semibold text-gray-800 mb-3">Player Stats</h2>

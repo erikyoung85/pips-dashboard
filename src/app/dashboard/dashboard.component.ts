@@ -18,12 +18,27 @@ import {
   type PipsParticipant,
 } from '../services/pips-participants/pips-participants.service';
 
+// Assumes that Pips #259 was on May 3, 2026.
+function getPipsNumberForDate(date: Date): number {
+  const anchor = new Date(2026, 4, 3); // May 3, 2026
+  anchor.setHours(0, 0, 0, 0);
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+  const daysDiff = Math.round((target.getTime() - anchor.getTime()) / (24 * 60 * 60 * 1000));
+  return 259 + daysDiff;
+}
+
 interface ParticipantStats {
   name: string;
   gamesPlayed: number;
   averageTime: number;
   fastestTime: number;
   slowestTime: number;
+}
+
+interface TodayEntry {
+  name: string;
+  durationSeconds: number | null;
 }
 
 @Component({
@@ -92,6 +107,39 @@ export class DashboardComponent {
   readonly leaderboardSlowest = computed(() =>
     [...this.participantStats()].sort((a, b) => b.slowestTime - a.slowestTime),
   );
+
+  readonly todaysPipsNumber = computed(() => getPipsNumberForDate(new Date()));
+
+  readonly todaysGameHeader = computed(() => `Pips #${this.todaysPipsNumber()}`);
+
+  readonly todaysResults = computed<TodayEntry[]>(() => {
+    const results = this.rawResults();
+    const participants = this.rawParticipants();
+    if (!results || !participants) return [];
+
+    const pipsNum = this.todaysPipsNumber();
+    const todayMap = new Map<string, number>();
+    for (const r of results) {
+      if (r.pips_number === pipsNum) {
+        todayMap.set(r.sender_phone_number, r.duration_seconds);
+      }
+    }
+
+    return participants
+      .map(
+        (p): TodayEntry => ({
+          name: p.name,
+          durationSeconds: todayMap.get(p.phone_number) ?? null,
+        }),
+      )
+      .sort((a, b) => {
+        if (a.durationSeconds !== null && b.durationSeconds !== null)
+          return a.durationSeconds - b.durationSeconds;
+        if (a.durationSeconds !== null) return -1;
+        if (b.durationSeconds !== null) return 1;
+        return a.name.localeCompare(b.name);
+      });
+  });
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
