@@ -1,8 +1,29 @@
 <div class="min-h-screen bg-gray-100">
   <!-- Header -->
   <header class="bg-white border-b border-gray-200 px-4 py-5 md:px-8">
-    <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Pips Dashboard</h1>
-    <p class="text-sm text-gray-500 mt-1">Daily puzzle stats &amp; leaderboards</p>
+    <div class="flex items-start justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Pips Dashboard</h1>
+        <p class="text-sm text-gray-500 mt-1">Daily puzzle stats &amp; leaderboards</p>
+      </div>
+      <div class="flex flex-col items-end gap-1">
+        <p-multiselect
+          [options]="participantOptions()"
+          [ngModel]="selectedParticipants()"
+          (ngModelChange)="selectedParticipants.set($event)"
+          optionLabel="name"
+          placeholder="Compare participants"
+          display="chip"
+          [style]="{ 'min-width': '220px', 'max-width': '360px' }"
+          class="text-sm"
+        />
+        @if (selectedParticipants().length > 0) {
+          <p class="text-xs text-gray-400 text-right max-w-xs">
+            Stats only include games every selected participant has completed.
+          </p>
+        }
+      </div>
+    </div>
   </header>
 
   <main class="px-4 py-6 max-w-5xl mx-auto space-y-8 md:px-8 md:py-8">

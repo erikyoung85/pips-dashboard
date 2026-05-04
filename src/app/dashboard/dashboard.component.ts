@@ -7,11 +7,13 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { PipsResultsService, type PipsResult } from '../services/pips-results/pips-results.service';
 import {
   PipsParticipantsService,
@@ -44,7 +46,7 @@ interface TodayEntry {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CardModule, TableModule, TagModule, SkeletonModule],
+  imports: [CardModule, TableModule, TagModule, SkeletonModule, MultiSelectModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,14 +60,48 @@ export class DashboardComponent {
   readonly rawResults = signal<PipsResult[] | null>(null);
   readonly rawParticipants = signal<PipsParticipant[] | null>(null);
   readonly error = signal<string | null>(null);
+  readonly selectedParticipants = signal<PipsParticipant[]>([]);
 
   readonly isLoading = computed(
     () => (this.rawResults() === null || this.rawParticipants() === null) && this.error() === null,
   );
 
-  readonly participantStats = computed<ParticipantStats[]>(() => {
+  readonly participantOptions = computed(() => this.rawParticipants() ?? []);
+
+  readonly filteredParticipants = computed<PipsParticipant[]>(() => {
+    const selected = this.selectedParticipants();
+    return selected.length > 0 ? selected : (this.rawParticipants() ?? []);
+  });
+
+  readonly filteredResults = computed<PipsResult[]>(() => {
     const results = this.rawResults();
-    const participants = this.rawParticipants();
+    const selected = this.selectedParticipants();
+    if (!results) return [];
+    if (selected.length === 0) return results;
+
+    const selectedPhones = new Set(selected.map((p) => p.phone_number));
+
+    const gamePhones = new Map<number, Set<string>>();
+    for (const r of results) {
+      if (!selectedPhones.has(r.sender_phone_number)) continue;
+      const phones = gamePhones.get(r.pips_number) ?? new Set<string>();
+      phones.add(r.sender_phone_number);
+      gamePhones.set(r.pips_number, phones);
+    }
+
+    const validPipsNumbers = new Set<number>();
+    for (const [pipsNum, phones] of gamePhones) {
+      if (phones.size === selectedPhones.size && [...selectedPhones].every((p) => phones.has(p))) {
+        validPipsNumbers.add(pipsNum);
+      }
+    }
+
+    return results.filter((r) => validPipsNumbers.has(r.pips_number));
+  });
+
+  readonly participantStats = computed<ParticipantStats[]>(() => {
+    const results = this.filteredResults();
+    const participants = this.filteredParticipants();
     if (!results || !participants) return [];
 
     const phoneToName = new Map<string, string>(participants.map((p) => [p.phone_number, p.name]));
@@ -114,7 +150,7 @@ export class DashboardComponent {
 
   readonly todaysResults = computed<TodayEntry[]>(() => {
     const results = this.rawResults();
-    const participants = this.rawParticipants();
+    const participants = this.filteredParticipants();
     if (!results || !participants) return [];
 
     const pipsNum = this.todaysPipsNumber();
